@@ -1,0 +1,224 @@
+openapi: 3.0.0
+servers:
+  - url: 'https://uat.cloud.api.aig.net/valic/rs-individuals-api'
+    description: UAT
+info:
+  title: Individuals API
+  description: 'Under Group Transformation, CDA(client data architecture) team has created solution for the problem when same individual’s records exist in different source systems (VSYS, VFA, NAVISYS etc). CDA team reads the  data from source system feeds and applies the rule matching algorithm to tie the same individual’s records by UUID (Universal Unique Id). <br>  <br> As part of Retirement Services (RS), this Individuals API expose services for the consumer to get complete view of the customers and manage their data. <br>  <br> GR transformation initiative is to develop business capabilities to decouple platform components and systems and conceal complexity and underlying limitation. <br>  <br> This API is going to be used as base api for many use case scenario. Example Call center, If call center is recording individuals call information then that information can be retrieved later on using this system specifig unique identifier.'
+  contact:
+    name: LevelUp-API@aig.com
+    email: LevelUp-API@aig.com
+  version: 1.0.0
+tags:
+  - name: Search
+    description: 'Search Individuals Ids, Individuals'
+  - name: Retrieve
+    description: 'Retrieve Individual Profile, Addresses, Employments, Contacts etc.'
+  - name: Create
+    description: 'Create Individual, Address, Email, Phone etc.'
+  - name: Update
+    description: 'Update Individual, Address, Email, Phone etc.'
+paths:
+  /v1/individuals/ids/search:
+    post:
+      tags:
+        - Search
+      summary: 'Search Individuals Ids (PartyKey, UUID).'
+      description: Search Individuals Ids
+      operationId: searchIndividualsIds
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndividualsIdsSearchRequest'
+      parameters:
+        - name: sortdirection
+          in: query
+          description: The direction to sort results
+          required: false
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+        - name: sortfield
+          in: query
+          description: Field on which sorting will be applied
+          required: false
+          schema:
+            type: string
+            default: confidenceLevel
+            enum:
+              - firstName
+              - lastName
+              - systemCode
+              - confidenceLevel
+        - name: limit
+          in: query
+          description: Number of records to retrieve from the total result set
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 1000
+            default: 10
+        - name: offset
+          in: query
+          description: Number of records to skip in the total result set
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Request completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndividualsIdsSearchResponse'
+        '400':
+          description: Return 400 Bad Request when the request message is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+              example:
+                message:
+                  type: Bad Request
+                  code: 400
+                  description: Invalid request parameter(s)
+        '404':
+          description: '404 Not Found | Service is stopped or the URL is incorrect.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+              example:
+                message:
+                  type: Not Found
+                  code: 404
+                  description: Individual Id(s) Not Found
+        '405':
+          description: Method Not Allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+              example:
+                message:
+                  type: Method Not Allowed
+                  code: 405
+                  description: Method not allowed
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+              example:
+                message:
+                  type: Internal Server Error
+                  code: 500
+                  description: Internal Server Error
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+              example:
+                message:
+                  type: Service Unavailable
+                  code: 503
+                  description: Service Unavailable
+      security:
+        - api_key: []
+components:
+  schemas:
+    IndividualId:
+      type: object
+      properties:
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        systemCode:
+          type: string
+        emailAddress:
+          type: string
+        universalUniqueIdentifier:
+          type: string
+        confidenceLevel:
+          type: integer
+        partyKey:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartyKey'
+    IndividualsIdsSearchRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        emailAddress:
+          type: string
+        dateOfBirth:
+          type: string
+        taxId:
+          type: string
+        systemCode:
+          type: string
+        universalUniqueIdentifier:
+          type: string
+        confidenceLevel:
+          type: string
+        participantId:
+          type: string
+        prospectId:
+          type: string
+      x-examples: {}
+    IndividualsIdsSearchResponse:
+      title: IndividualsIdsSearchResponse
+      type: object
+      properties:
+        message:
+          $ref: '#/components/schemas/Message'
+        startIndex:
+          type: integer
+        endIndex:
+          type: integer
+        totalCount:
+          type: integer
+        individualsIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndividualId'
+    Message:
+      type: object
+      properties:
+        type:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+    PartyKey:
+      title: PartyKey
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+  securitySchemes:
+    api_key:
+      description: |
+        For this sample, you can use the api key `special-key` to test the authorization filters.
+      type: apiKey
+      name: api_key
+      in: header
