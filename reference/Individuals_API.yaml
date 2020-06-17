@@ -1,6 +1,6 @@
 openapi: 3.0.0
 servers:
-  - url: 'https://uat.cloud.api.aig.net/valic/rs-individuals-api'
+  - url: 'https://dev.cloud.api.aig.net/valic/rs-individuals-api'
     description: UAT
 info:
   title: Individuals API
