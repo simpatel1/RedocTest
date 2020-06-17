@@ -135,7 +135,7 @@ paths:
                   code: 503
                   description: Service Unavailable
       security:
-        - api_key: []
+        - ApiKeyAuth: []
 components:
   schemas:
     IndividualId:
@@ -216,9 +216,7 @@ components:
         value:
           type: string
   securitySchemes:
-    api_key:
-      description: |
-        For this sample, you can use the api key `special-key` to test the authorization filters.
+    ApiKeyAuth:
       type: apiKey
-      name: api_key
+      name: apikey
       in: header
